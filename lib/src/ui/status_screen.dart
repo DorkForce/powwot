@@ -7,6 +7,8 @@ import '../native.dart';
 import '../status_store.dart';
 import 'permissions_card.dart';
 import 'settings_screen.dart';
+import '../update_service.dart';
+import 'update_dialog.dart';
 
 class StatusScreen extends StatefulWidget {
   const StatusScreen({super.key});
@@ -15,13 +17,15 @@ class StatusScreen extends StatefulWidget {
   State<StatusScreen> createState() => _StatusScreenState();
 }
 
-class _StatusScreenState extends State<StatusScreen> with WidgetsBindingObserver {
+class _StatusScreenState extends State<StatusScreen>
+    with WidgetsBindingObserver {
   StatusSnapshot _snap = StatusSnapshot();
   bool _monitoring = false;
   bool _alarm = false;
   bool _configured = false;
   Timer? _timer;
   final _permKey = GlobalKey<PermissionsCardState>();
+  final UpdateService _updateService = UpdateService();
 
   @override
   void initState() {
@@ -29,6 +33,7 @@ class _StatusScreenState extends State<StatusScreen> with WidgetsBindingObserver
     WidgetsBinding.instance.addObserver(this);
     _refresh();
     _timer = Timer.periodic(const Duration(seconds: 3), (_) => _refresh());
+    unawaited(_checkForUpdate());
   }
 
   @override
@@ -43,6 +48,7 @@ class _StatusScreenState extends State<StatusScreen> with WidgetsBindingObserver
     if (state == AppLifecycleState.resumed) {
       _refresh();
       _permKey.currentState?.refresh();
+      unawaited(_checkForUpdate());
     }
   }
 
@@ -75,6 +81,19 @@ class _StatusScreenState extends State<StatusScreen> with WidgetsBindingObserver
     await _refresh();
   }
 
+  /// Looks for a newer build (at most once a day) and offers it.
+  Future<void> _checkForUpdate() async {
+    if (!_updateService.isSupported) return;
+    try {
+      await _updateService.cleanUp();
+      await Future<void>.delayed(const Duration(seconds: 2));
+      if (!mounted) return;
+      await checkAndPromptForUpdate(context, _updateService);
+    } catch (e) {
+      debugPrint('Update check failed: $e');
+    }
+  }
+
   String _fmt(DateTime? t) {
     if (t == null) return 'never';
     final l = t.toLocal();
@@ -93,7 +112,11 @@ class _StatusScreenState extends State<StatusScreen> with WidgetsBindingObserver
             tooltip: 'Settings',
             icon: const Icon(Icons.settings),
             onPressed: () async {
-              await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SettingsScreen()));
+              await Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => SettingsScreen(updateService: _updateService),
+                ),
+              );
               await _refresh();
             },
           ),
@@ -111,10 +134,16 @@ class _StatusScreenState extends State<StatusScreen> with WidgetsBindingObserver
                   leading: const Icon(Icons.warning, color: Colors.white),
                   title: const Text(
                     'ALARM RINGING',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   trailing: FilledButton(
-                    style: FilledButton.styleFrom(backgroundColor: Colors.white, foregroundColor: Colors.red),
+                    style: FilledButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.red,
+                    ),
                     onPressed: () async {
                       await NativeApp.dismissAlarm();
                       await _refresh();
@@ -143,13 +172,19 @@ class _StatusScreenState extends State<StatusScreen> with WidgetsBindingObserver
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Status', style: Theme.of(context).textTheme.titleMedium),
+                    Text(
+                      'Status',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
                     const SizedBox(height: 8),
                     Text('Last check: ${_fmt(_snap.lastCheck)}'),
                     Text('Last successful check: ${_fmt(_snap.lastOk)}'),
                     if (_snap.lastError != null) ...[
                       const SizedBox(height: 6),
-                      Text('Connection error: ${_snap.lastError}', style: TextStyle(color: scheme.error)),
+                      Text(
+                        'Connection error: ${_snap.lastError}',
+                        style: TextStyle(color: scheme.error),
+                      ),
                     ],
                     const SizedBox(height: 8),
                     Row(
@@ -158,7 +193,9 @@ class _StatusScreenState extends State<StatusScreen> with WidgetsBindingObserver
                           onPressed: _monitoring
                               ? () async {
                                   await NativeApp.pollNow();
-                                  await Future<void>.delayed(const Duration(seconds: 2));
+                                  await Future<void>.delayed(
+                                    const Duration(seconds: 2),
+                                  );
                                   await _refresh();
                                 }
                               : null,
@@ -187,7 +224,10 @@ class _StatusScreenState extends State<StatusScreen> with WidgetsBindingObserver
                     ),
                   ),
                   if (_snap.events.isEmpty)
-                    const Padding(padding: EdgeInsets.fromLTRB(16, 0, 16, 16), child: Text('No events yet.')),
+                    const Padding(
+                      padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+                      child: Text('No events yet.'),
+                    ),
                   for (final e in _snap.events.take(50))
                     ListTile(
                       dense: true,

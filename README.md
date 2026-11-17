@@ -23,12 +23,18 @@ transfer, and the app never logs it. `.gitignore` blocks `key.properties`, `*.jk
 
 ## Install
 
-Download the APK (from a GitHub Actions run's `powwot-apk` artifact, kept for 3 days, or a
-link you were given). Open it on the phone and allow "install unknown apps" for your
-browser or file manager when prompted.
+Download the APK from https://powwot.dorkforce.com/download/ (the current sideload
+page), or from a GitHub Actions run's `powwot-apk` artifact (kept for 3 days). Open it
+on the phone and allow "install unknown apps" for your browser or file manager when
+prompted.
 
-Release APKs are signed with the debug key of whichever machine built them. To switch to
-an APK built on a different machine, uninstall the old one first.
+Once installed, the app checks that page for a newer build and shows **Update available**.
+You can also use **Settings → Check for updates**. Downloads are SHA-256 checked before
+the installer opens.
+
+Release APKs from this project are signed with the same debug key as the 0.1.1 sideload
+build, so they install over it. An APK signed with a different key needs the old app
+uninstalled first.
 
 ## Phone setup
 
@@ -87,8 +93,17 @@ flutter build apk --release      # build/app/outputs/flutter-apk/app-release.apk
 cd android && ./gradlew :app:testDebugUnitTest   # Kotlin ramp unit test
 ```
 
+Stage a download-page release (does not upload):
+
+```bash
+python3 server/tools/publish_release.py PATH/TO/Powwot-0.1.2-3-YYYYMMDD.apk \
+    --version-name 0.1.2 --version-code 3 --notes "What changed" \
+    --out /workspace/deploy/powwot-YYYYMMDD
+```
+
 `.github/workflows/build-apk.yml` builds the APK on every push to `main` and uploads it
-as an artifact kept for 3 days.
+as an artifact kept for 3 days. The live page at https://powwot.dorkforce.com/download/
+is updated separately; `version.json` should be uploaded last.
 
 ## How it works
 

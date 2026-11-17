@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Download Powwot for Android</title>
+  <meta name="description" content="Powwot: a power-outage alarm for your phone. Download the Android app.">
+  <meta name="theme-color" content="#12263A">
+  <style>
+    :root {
+      --navy: #12263A;
+      --navy-dark: #0b1724;
+      --gold: #E6B325;
+      --gold-dark: #c49416;
+      --ink: #12263A;
+      --muted: #5a6b7a;
+      --bg: #eef2f5;
+      --card: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.55;
+    }
+    header {
+      background: linear-gradient(160deg, var(--navy) 0%, var(--navy-dark) 100%);
+      color: #fff;
+      padding: 40px 20px 72px;
+      text-align: center;
+    }
+    .bolt {
+      display: inline-block;
+      width: 56px;
+      height: 56px;
+      margin-bottom: 10px;
+    }
+    .bolt svg { width: 56px; height: 56px; display: block; }
+    header h1 { margin: 0 0 6px; font-size: 2.2rem; letter-spacing: .5px; }
+    header p { margin: 0; opacity: .92; font-size: 1.05rem; }
+    main { max-width: 640px; margin: -48px auto 40px; padding: 0 16px; }
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 18px;
+      box-shadow: 0 6px 24px rgba(18, 38, 58, .12);
+    }
+    .card h2 { margin: 0 0 12px; font-size: 1.15rem; }
+    .version { text-align: center; }
+    .version .meta { color: var(--muted); font-size: .95rem; margin: 0 0 16px; }
+    .btn {
+      display: block;
+      width: 100%;
+      padding: 18px 20px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--navy);
+      background: var(--gold);
+      border-radius: 12px;
+      text-align: center;
+      text-decoration: none;
+    }
+    .btn:hover, .btn:focus { background: var(--gold-dark); color: #fff; }
+    .notes { margin: 16px 0 0; color: var(--muted); font-size: .95rem; white-space: pre-line; }
+    .sha { margin: 14px 0 0; font-size: .78rem; color: var(--muted); word-break: break-all; }
+    .sha code { font-size: .78rem; }
+    .qr { text-align: center; }
+    .qr img { width: 200px; height: 200px; max-width: 70%; image-rendering: pixelated; }
+    .qr p { margin: 8px 0 0; color: var(--muted); font-size: .95rem; }
+    ol { margin: 0; padding-left: 1.3rem; }
+    ol li { margin-bottom: 10px; }
+    .small { color: var(--muted); font-size: .92rem; }
+    footer { text-align: center; color: var(--muted); font-size: .85rem; padding: 0 16px 36px; }
+    code { background: #eef2f5; padding: 1px 6px; border-radius: 5px; font-size: .9em; }
+    .desktop-only { display: none; }
+    @media (min-width: 720px) { .desktop-only { display: block; } }
+  </style>
+</head>
+<body>
+  <header>
+    <span class="bolt" aria-hidden="true">
+      <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#E6B325" d="M27.5 3L8 26.5h12.2L16.5 45 40 21.2H27.6L27.5 3z"/>
+      </svg>
+    </span>
+    <h1>Powwot</h1>
+    <p>A power-outage alarm for your phone.</p>
+  </header>
+
+  <main>
+    <section class="card version">
+      <h2>Latest version</h2>
+      <p class="meta">
+        Version <strong id="version-name">0.1.2</strong>
+        (build <span id="version-code">3</span>)
+      </p>
+      <a class="btn" id="download" href="Powwot-0.1.2-3-20261117.apk" download>Download APK for Android</a>
+      <p class="notes" id="notes"></p>
+      <p class="sha">SHA-256: <code id="sha">SHA256_PLACEHOLDER</code></p>
+    </section>
+
+    <section class="card qr desktop-only" id="qr-card">
+      <h2>On a computer? Scan with your phone</h2>
+      <img src="qr.svg" alt="QR code for this download page" width="200" height="200">
+      <p>Point your phone's camera at the code to open this page.</p>
+    </section>
+
+    <section class="card">
+      <h2>How to install on Android</h2>
+      <ol>
+        <li>Tap <strong>Download APK for Android</strong>. If Android warns that this type of file can harm your device, choose <strong>Download anyway</strong>. Powwot is not in an app store.</li>
+        <li>Open the downloaded file (from the notification or your <strong>Downloads</strong> folder).</li>
+        <li>If asked, allow <strong>Install unknown apps</strong> for the browser or Files app you used. Tap <strong>Settings</strong>, switch on <strong>Allow from this source</strong>, then go back.</li>
+        <li>Tap <strong>Install</strong>, then <strong>Open</strong>.</li>
+        <li>Allow <strong>Notifications</strong> when Powwot asks, then open <strong>Settings</strong> to enter your mailbox and turn monitoring on.</li>
+      </ol>
+      <p class="small" style="margin-top:14px">Already have Powwot? Updates arrive inside the app: it shows <strong>Update available</strong> when a newer version is posted here, and you can also use <strong>Settings &rarr; Check for updates</strong>.</p>
+    </section>
+
+    <section class="card">
+      <h2>Prefer an update tracker?</h2>
+      <p class="small" style="margin:0">
+        <a href="https://github.com/ImranR98/Obtainium" rel="noopener">Obtainium</a> users can add this page,
+        <code>https://powwot.dorkforce.com/download/</code>, as an app source. It watches for new versions
+        and installs them for you. The Powwot app's own updater does the same thing, so you only need one of them.
+      </p>
+    </section>
+  </main>
+
+  <footer>
+    Powwot &middot; <span id="footer-version"></span><br>
+    Only install files from this page. Compare the SHA-256 above if you want to check your download.
+  </footer>
+
+  <script>
+    (function () {
+      fetch('version.json', { cache: 'no-store' })
+        .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+        .then(function (v) {
+          if (!v || !v.apkUrl || !/^https:\/\//.test(v.apkUrl)) return;
+          document.getElementById('version-name').textContent = v.versionName || '';
+          document.getElementById('version-code').textContent = v.versionCode || '';
+          document.getElementById('download').href = v.apkUrl;
+          if (v.sha256) document.getElementById('sha').textContent = v.sha256;
+          if (v.notes) document.getElementById('notes').textContent = v.notes;
+          document.getElementById('footer-version').textContent =
+            'Version ' + (v.versionName || '') + ' (build ' + (v.versionCode || '') + ')';
+        })
+        .catch(function () {});
+    })();
+  </script>
+</body>
+</html>
