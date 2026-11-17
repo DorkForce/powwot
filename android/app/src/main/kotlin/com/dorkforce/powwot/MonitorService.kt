@@ -61,7 +61,7 @@ class MonitorService : Service() {
             ACTION_TEST_ALARM -> startAlarm(
                 "TEST alarm",
                 intent?.getStringExtra(EXTRA_TONE),
-                intent?.getIntExtra(EXTRA_RAMP, 100) ?: 100,
+                intent?.getIntExtra(EXTRA_RAMP, RampMath.DEFAULT_RAMP_SECONDS) ?: RampMath.DEFAULT_RAMP_SECONDS,
                 intent?.getBooleanExtra(EXTRA_MAX_STREAM, true) ?: true,
             )
             ACTION_DISMISS -> stopAlarm("dismissed", null)
@@ -111,7 +111,7 @@ class MonitorService : Service() {
                     startAlarm(
                         call.argument<String>("reason") ?: "MySpool POWER OFF Alert",
                         call.argument<String>("toneUri"),
-                        call.argument<Int>("rampSeconds") ?: 100,
+                        call.argument<Int>("rampSeconds") ?: RampMath.DEFAULT_RAMP_SECONDS,
                         call.argument<Boolean>("maxStream") ?: true,
                     )
                     result.success(null)

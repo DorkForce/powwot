@@ -7,7 +7,28 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 const _passwordKey = 'imap_password';
 
+/// Default volume ramp: silent at 0:00, full volume at 5:00.
+const int defaultRampSeconds = 300;
+
+/// Previous default (100 s). Migrated to [defaultRampSeconds] unless the user
+/// explicitly chose a value.
+const int legacyDefaultRampSeconds = 100;
+
+const String _rampSecondsKey = 'rampSeconds';
+const String _rampSecondsExplicitKey = 'rampSecondsExplicit';
+
 const FlutterSecureStorage secureStorage = FlutterSecureStorage();
+
+/// Picks the ramp length from stored prefs.
+///
+/// A stored value of [legacyDefaultRampSeconds] is treated as the old unset
+/// default and migrated to [defaultRampSeconds], unless [explicit] is true
+/// (the user saved a ramp setting themselves). Other stored values are kept.
+int resolveRampSeconds({int? stored, bool explicit = false}) {
+  if (stored == null) return defaultRampSeconds;
+  if (!explicit && stored == legacyDefaultRampSeconds) return defaultRampSeconds;
+  return stored;
+}
 
 class AppConfig {
   AppConfig({
@@ -17,7 +38,7 @@ class AppConfig {
     this.username = '',
     this.mailbox = 'INBOX',
     this.pollSeconds = 60,
-    this.rampSeconds = 100,
+    this.rampSeconds = defaultRampSeconds,
     this.autoStopMinutes = 60,
     this.toneUri = '',
     this.toneName = '',
@@ -47,6 +68,14 @@ class AppConfig {
   static Future<AppConfig> load() async {
     final p = _prefs;
     final d = AppConfig();
+    final storedRamp = await p.getInt(_rampSecondsKey);
+    final explicitRamp = await p.getBool(_rampSecondsExplicitKey) ?? false;
+    final ramp = resolveRampSeconds(stored: storedRamp, explicit: explicitRamp);
+    if (storedRamp != null && storedRamp != ramp) {
+      // Persist the migrated default so settings and later loads stay consistent.
+      // Do not set the explicit flag — this was not a user choice.
+      await p.setInt(_rampSecondsKey, ramp);
+    }
     return AppConfig(
       host: await p.getString('host') ?? d.host,
       port: await p.getInt('port') ?? d.port,
@@ -54,7 +83,7 @@ class AppConfig {
       username: await p.getString('username') ?? d.username,
       mailbox: await p.getString('mailbox') ?? d.mailbox,
       pollSeconds: await p.getInt('pollSeconds') ?? d.pollSeconds,
-      rampSeconds: await p.getInt('rampSeconds') ?? d.rampSeconds,
+      rampSeconds: ramp,
       autoStopMinutes: await p.getInt('autoStopMinutes') ?? d.autoStopMinutes,
       toneUri: await p.getString('toneUri') ?? d.toneUri,
       toneName: await p.getString('toneName') ?? d.toneName,
@@ -71,7 +100,8 @@ class AppConfig {
     await p.setString('username', username.trim());
     await p.setString('mailbox', mailbox.trim().isEmpty ? 'INBOX' : mailbox.trim());
     await p.setInt('pollSeconds', pollSeconds);
-    await p.setInt('rampSeconds', rampSeconds);
+    await p.setInt(_rampSecondsKey, rampSeconds);
+    await p.setBool(_rampSecondsExplicitKey, true);
     await p.setInt('autoStopMinutes', autoStopMinutes);
     await p.setString('toneUri', toneUri);
     await p.setString('toneName', toneName);

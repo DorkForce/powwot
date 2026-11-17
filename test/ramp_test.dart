@@ -1,9 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:powwot/src/config.dart';
 import 'package:powwot/src/ramp.dart';
 
 void main() {
   group('rampVolume', () {
-    test('0 at start, 100% at end of default 100 s ramp', () {
+    test('0 at start, 100% at end of a 100 s ramp', () {
       expect(rampVolume(Duration.zero, 100), 0.0);
       expect(rampVolume(const Duration(seconds: 100), 100), 1.0);
     });
@@ -30,5 +31,24 @@ void main() {
     expect(timeToVolume(1.0, 100), const Duration(seconds: 100));
     expect(timeToVolume(2.0, 100), const Duration(seconds: 100));
     expect(timeToVolume(0.5, 0), Duration.zero);
+  });
+
+  group('five-minute default ramp', () {
+    const ramp = defaultRampSeconds;
+    test('starts silent and reaches max at 5:00', () {
+      expect(ramp, 300);
+      expect(rampVolume(Duration.zero, ramp), 0.0);
+      expect(rampVolume(const Duration(minutes: 5), ramp), 1.0);
+    });
+    test('linear through the five minutes', () {
+      expect(rampVolume(const Duration(seconds: 75), ramp), closeTo(0.25, 1e-9));
+      expect(rampVolume(const Duration(minutes: 2, seconds: 30), ramp), closeTo(0.5, 1e-9));
+      expect(rampVolume(const Duration(milliseconds: 299000), ramp), closeTo(299 / 300, 1e-9));
+    });
+    test('timeToVolume hits 5:00 at full volume', () {
+      expect(timeToVolume(0.0, ramp), Duration.zero);
+      expect(timeToVolume(0.5, ramp), const Duration(minutes: 2, seconds: 30));
+      expect(timeToVolume(1.0, ramp), const Duration(minutes: 5));
+    });
   });
 }

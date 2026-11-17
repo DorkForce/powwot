@@ -29,7 +29,7 @@ class MainActivity : FlutterActivity() {
                 "testAlarm" -> {
                     MonitorService.send(this, MonitorService.ACTION_TEST_ALARM) {
                         putExtra(MonitorService.EXTRA_TONE, call.argument<String>("toneUri"))
-                        putExtra(MonitorService.EXTRA_RAMP, call.argument<Int>("rampSeconds") ?: 100)
+                        putExtra(MonitorService.EXTRA_RAMP, call.argument<Int>("rampSeconds") ?: RampMath.DEFAULT_RAMP_SECONDS)
                         putExtra(MonitorService.EXTRA_MAX_STREAM, call.argument<Boolean>("maxStream") ?: true)
                     }
                     result.success(null)
