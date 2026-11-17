@@ -5,9 +5,13 @@ import '../config.dart';
 import '../imap_checker.dart';
 import '../native.dart';
 import '../status_store.dart';
+import '../update_service.dart';
+import 'update_dialog.dart';
 
 class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
+  final UpdateService? updateService;
+
+  const SettingsScreen({super.key, this.updateService});
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -39,7 +43,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   void dispose() {
-    for (final c in [_host, _port, _user, _pass, _mailbox, _poll, _ramp, _window]) {
+    for (final c in [
+      _host,
+      _port,
+      _user,
+      _pass,
+      _mailbox,
+      _poll,
+      _ramp,
+      _window,
+    ]) {
       c.dispose();
     }
     super.dispose();
@@ -80,7 +93,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Future<String?> _effectivePassword() async => _pass.text.isNotEmpty ? _pass.text : await readPassword();
+  Future<String?> _effectivePassword() async =>
+      _pass.text.isNotEmpty ? _pass.text : await readPassword();
 
   Future<void> _save() async {
     if (!(_form.currentState?.validate() ?? false)) return;
@@ -100,7 +114,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       _cfg = c;
       _hasSavedPassword = has;
     });
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Settings saved')));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text('Settings saved')));
   }
 
   Future<void> _testConnection() async {
@@ -122,7 +137,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
       try {
         final snap = await s.select(c.mailbox);
         _testOk = true;
-        _testResult = 'Connected. ${c.mailbox}: ${snap.messageCount} messages (highest UID ${snap.highestUid}).';
+        _testResult =
+            'Connected. ${c.mailbox}: ${snap.messageCount} messages (highest UID ${snap.highestUid}).';
       } finally {
         await s.close();
       }
@@ -135,7 +151,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _testAlarm() async {
     final c = _fromForm();
-    await NativeApp.testAlarm(toneUri: c.toneUri, rampSeconds: c.rampSeconds, maxStream: c.maxAlarmStream);
+    await NativeApp.testAlarm(
+      toneUri: c.toneUri,
+      rampSeconds: c.rampSeconds,
+      maxStream: c.maxAlarmStream,
+    );
     await StatusStore.log('Test alarm started (ramp ${c.rampSeconds}s)');
   }
 
@@ -158,7 +178,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final c = _cfg;
-    if (c == null) return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    if (c == null)
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     final digits = [FilteringTextInputFormatter.digitsOnly];
     return Scaffold(
       appBar: AppBar(
@@ -170,13 +191,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16),
           children: [
-            Text('IMAP mailbox', style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              'IMAP mailbox',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             TextFormField(
               controller: _host,
               decoration: const InputDecoration(labelText: 'IMAP host'),
               keyboardType: TextInputType.url,
               autocorrect: false,
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Required' : null,
             ),
             Row(
               children: [
@@ -210,7 +235,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               decoration: const InputDecoration(labelText: 'Username'),
               keyboardType: TextInputType.emailAddress,
               autocorrect: false,
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
+              validator: (v) =>
+                  (v == null || v.trim().isEmpty) ? 'Required' : null,
             ),
             TextFormField(
               controller: _pass,
@@ -223,15 +249,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ? 'A password is saved (encrypted on this phone). Leave blank to keep it.'
                     : 'Stored only on this phone, encrypted with the Android Keystore.',
                 suffixIcon: IconButton(
-                  icon: Icon(_showPassword ? Icons.visibility_off : Icons.visibility),
-                  onPressed: () => setState(() => _showPassword = !_showPassword),
+                  icon: Icon(
+                    _showPassword ? Icons.visibility_off : Icons.visibility,
+                  ),
+                  onPressed: () =>
+                      setState(() => _showPassword = !_showPassword),
                 ),
               ),
-              validator: (v) => (!_hasSavedPassword && (v == null || v.isEmpty)) ? 'Required' : null,
+              validator: (v) => (!_hasSavedPassword && (v == null || v.isEmpty))
+                  ? 'Required'
+                  : null,
             ),
             TextFormField(
               controller: _mailbox,
-              decoration: const InputDecoration(labelText: 'Folder', hintText: 'INBOX'),
+              decoration: const InputDecoration(
+                labelText: 'Folder',
+                hintText: 'INBOX',
+              ),
               autocorrect: false,
             ),
             const SizedBox(height: 8),
@@ -240,7 +274,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 FilledButton.tonalIcon(
                   onPressed: _testing ? null : _testConnection,
                   icon: _testing
-                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
                       : const Icon(Icons.wifi_tethering),
                   label: const Text('Test connection'),
                 ),
@@ -251,11 +289,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 padding: const EdgeInsets.only(top: 8),
                 child: Text(
                   _testResult!,
-                  style: TextStyle(color: _testOk ? Colors.green : Theme.of(context).colorScheme.error),
+                  style: TextStyle(
+                    color: _testOk
+                        ? Colors.green
+                        : Theme.of(context).colorScheme.error,
+                  ),
                 ),
               ),
             const Divider(height: 32),
-            Text('Checking & alarm', style: Theme.of(context).textTheme.titleMedium),
+            Text(
+              'Checking & alarm',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
             TextFormField(
               controller: _poll,
               decoration: const InputDecoration(
@@ -270,7 +315,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               controller: _ramp,
               decoration: const InputDecoration(
                 labelText: 'Volume ramp (seconds, 0 to 100%)',
-                helperText: '0-3600, default 300 (5 minutes); 0 = full volume at once',
+                helperText:
+                    '0-3600, default 300 (5 minutes); 0 = full volume at once',
               ),
               keyboardType: TextInputType.number,
               inputFormatters: digits,
@@ -289,7 +335,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ListTile(
               contentPadding: EdgeInsets.zero,
               title: const Text('Alarm sound'),
-              subtitle: Text(c.toneUri.isEmpty ? 'powwot default (bundled)' : c.toneName),
+              subtitle: Text(
+                c.toneUri.isEmpty ? 'powwot default (bundled)' : c.toneName,
+              ),
               trailing: Wrap(
                 spacing: 4,
                 children: [
@@ -301,21 +349,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       }),
                       child: const Text('Default'),
                     ),
-                  TextButton(onPressed: _pickTone, child: const Text('Pick system tone')),
+                  TextButton(
+                    onPressed: _pickTone,
+                    child: const Text('Pick system tone'),
+                  ),
                 ],
               ),
             ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               title: const Text('Raise alarm volume to max while ringing'),
-              subtitle: const Text('Restored afterwards. The ramp then goes from silent to the loudest level.'),
+              subtitle: const Text(
+                'Restored afterwards. The ramp then goes from silent to the loudest level.',
+              ),
               value: c.maxAlarmStream,
               onChanged: (v) => setState(() => c.maxAlarmStream = v),
             ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
               title: const Text('Keep CPU awake while monitoring'),
-              subtitle: const Text('Most reliable timing; uses some extra battery.'),
+              subtitle: const Text(
+                'Most reliable timing; uses some extra battery.',
+              ),
               value: c.keepCpuAwake,
               onChanged: (v) => setState(() => c.keepCpuAwake = v),
             ),
@@ -331,7 +386,70 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             const SizedBox(height: 24),
             FilledButton(onPressed: _save, child: const Text('Save settings')),
+            if (widget.updateService?.isSupported ?? false) ...[
+              const SizedBox(height: 24),
+              _UpdatesCard(service: widget.updateService!),
+            ],
             const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// "App updates": shows the installed version and checks the download page.
+class _UpdatesCard extends StatefulWidget {
+  final UpdateService service;
+  const _UpdatesCard({required this.service});
+
+  @override
+  State<_UpdatesCard> createState() => _UpdatesCardState();
+}
+
+class _UpdatesCardState extends State<_UpdatesCard> {
+  bool _checking = false;
+  int? _build;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.service.installedBuild().then((b) {
+      if (mounted) setState(() => _build = b);
+    });
+  }
+
+  Future<void> _check() async {
+    setState(() => _checking = true);
+    try {
+      await checkAndPromptForUpdate(context, widget.service, manual: true);
+    } finally {
+      if (mounted) setState(() => _checking = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('App updates', style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 4),
+            Text(
+              _build == null ? 'Powwot' : 'Powwot build $_build',
+              key: const Key('settings_app_build'),
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+            const SizedBox(height: 8),
+            OutlinedButton.icon(
+              key: const Key('settings_check_updates_button'),
+              onPressed: _checking ? null : _check,
+              icon: const Icon(Icons.system_update),
+              label: Text(_checking ? 'Checking...' : 'Check for updates'),
+            ),
           ],
         ),
       ),
