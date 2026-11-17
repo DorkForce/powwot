@@ -5,6 +5,9 @@ package com.dorkforce.powwot
  * Linear from 0.0 to 1.0 over [rampSeconds]; a ramp of 0 means full volume at once.
  */
 object RampMath {
+    /** Silent at 0:00, full volume at 5:00. Mirrors lib/src/config.dart. */
+    const val DEFAULT_RAMP_SECONDS = 300
+
     fun volumeAt(elapsedMs: Long, rampSeconds: Int): Float {
         if (rampSeconds <= 0) return 1f
         if (elapsedMs <= 0L) return 0f

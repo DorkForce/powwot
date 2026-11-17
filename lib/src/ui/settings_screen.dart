@@ -71,7 +71,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       username: _user.text.trim(),
       mailbox: _mailbox.text.trim().isEmpty ? 'INBOX' : _mailbox.text.trim(),
       pollSeconds: int.tryParse(_poll.text) ?? 60,
-      rampSeconds: int.tryParse(_ramp.text) ?? 100,
+      rampSeconds: int.tryParse(_ramp.text) ?? defaultRampSeconds,
       autoStopMinutes: int.tryParse(_window.text) ?? 60,
       toneUri: c.toneUri,
       toneName: c.toneName,
@@ -270,7 +270,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               controller: _ramp,
               decoration: const InputDecoration(
                 labelText: 'Volume ramp (seconds, 0 to 100%)',
-                helperText: '0-3600, default 100; 0 = full volume at once',
+                helperText: '0-3600, default 300 (5 minutes); 0 = full volume at once',
               ),
               keyboardType: TextInputType.number,
               inputFormatters: digits,

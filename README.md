@@ -6,7 +6,7 @@ A small Android app that watches an email mailbox for power-outage alerts from a
 - Polls an IMAP mailbox (default every 60 s) for **new** messages whose subject contains
   `MySpool POWER OFF Alert`.
 - Sounds an alarm on the Android **alarm** stream, with a full-screen alert over the lock
-  screen. The volume ramps from 0 to 100% over 100 s (configurable).
+  screen. The volume ramps from 0 to 100% over 5 minutes (300 s, configurable).
 - The alarm loops until you tap **Dismiss**, or until a `MySpool POWER ON Alert` email
   arrives within the auto-stop window (default 60 min). The app then shows **Power restored**.
   A POWER ON email after the window is only logged.

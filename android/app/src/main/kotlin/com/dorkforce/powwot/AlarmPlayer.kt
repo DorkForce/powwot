@@ -21,7 +21,7 @@ class AlarmPlayer(private val ctx: Context) {
     private var player: MediaPlayer? = null
     private val handler = Handler(Looper.getMainLooper())
     private var startedAt = 0L
-    private var rampSeconds = 100
+    private var rampSeconds = RampMath.DEFAULT_RAMP_SECONDS
     private var savedStreamVolume: Int? = null
     private var savedInterruptionFilter: Int? = null
     private var vibrator: Vibrator? = null

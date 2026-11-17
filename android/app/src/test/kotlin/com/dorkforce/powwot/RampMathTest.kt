@@ -11,4 +11,10 @@ class RampMathTest {
     @Test fun zeroRampIsFull() = assertEquals(1f, RampMath.volumeAt(0, 0), 0f)
     @Test fun negativeElapsedIsSilent() = assertEquals(0f, RampMath.volumeAt(-5, 100), 0f)
     @Test fun customRamp() = assertEquals(0.25f, RampMath.volumeAt(7_500, 30), 1e-6f)
+
+    @Test fun fiveMinuteDefaultConstant() = assertEquals(300, RampMath.DEFAULT_RAMP_SECONDS)
+    @Test fun fiveMinuteStartsSilent() = assertEquals(0f, RampMath.volumeAt(0, 300), 0f)
+    @Test fun fiveMinuteHalfway() = assertEquals(0.5f, RampMath.volumeAt(150_000, 300), 1e-6f)
+    @Test fun fiveMinuteFullAtEnd() = assertEquals(1f, RampMath.volumeAt(300_000, 300), 0f)
+    @Test fun fiveMinuteJustBeforeEnd() = assertEquals(299f / 300f, RampMath.volumeAt(299_000, 300), 1e-6f)
 }
